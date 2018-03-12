@@ -37,18 +37,21 @@ export default class stackathon_reVRb extends React.Component {
     this.state = {
       playerState: new MediaPlayerState({ autoplay: true, muted: false }),
       currentSong: 'funProject.mp3',
-      bounceValue: new Animated.Value(0)
+      bounceValue: new Animated.Value(0),
+      currentTime:0
     }
+    this.animate = this.animate.bind(this)
   }
 
 
 
-  componentDidMount() {
-    this.state.bounceValue.setValue(2)
+  animate(event) {
+    this.setState({currentTime:event.nativeEvent.currentTime})
+    // this.state.bounceValue.setValue(2)
     Animated.spring(this.state.bounceValue,
       {
-        toValue:-.5,
-        friction:1,
+        toValue:event.nativeEvent.currentTime / 5,
+        friction:.5,
         tension:8
       }
     ).start()
@@ -57,7 +60,6 @@ export default class stackathon_reVRb extends React.Component {
 
 
   render() {
-    // console.log(OVRAudio)
     return (
       <View>
 
@@ -69,7 +71,7 @@ export default class stackathon_reVRb extends React.Component {
           {[{ x: 5, color: 'red' }, { x: 4, color: 'yellow' }, { x: 3, color: 'purple' }, { x: 2, color: 'green' }, { x: 1, color: 'blue' }].map(x => (<Sphere
             style={{
               color: x.color,
-              transform: [{ translate: [2 * Math.sin((72 * x.x * Math.PI / 180) - Math.PI), -1, 2 * Math.cos((- 72 * x.x * Math.PI / 180) - Math.PI)] }]
+              transform: [{ translate: [2* ((this.state.currentTime/ 10)+ 1) * Math.sin((72 * x.x * Math.PI / 180) - Math.PI - this.state.currentTime*Math.PI ), -1, 2* ((this.state.currentTime/ 10)+ 1) * Math.cos(( 72 * x.x * Math.PI / 180) - Math.PI - Math.PI*this.state.currentTime)] }]
             }}
             lit={true}
             key={x.x}
@@ -83,6 +85,7 @@ export default class stackathon_reVRb extends React.Component {
 
 
         <MusicPlayer
+          onTimeUpdate={this.animate}
           currentSong={asset(this.state.currentSong)}
           playerState={this.state.playerState}
         />
